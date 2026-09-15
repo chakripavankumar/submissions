@@ -13,7 +13,7 @@ class Order:
     
     def add_item(self,name,price):
         cleaned_price = clean_price(price)
-        self.items.append((name,clean_price))
+        self.items.append((name, cleaned_price))
     
     def total(self,discount_percent=10):
         subtotal=sum(price for name, price in self.items)    
