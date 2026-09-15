@@ -1,10 +1,13 @@
+import logging
 from loafly.models import Order
 from loafly.config import DISCOUNT_PERCENT
 
+logger = logging.getLogger("loafly.transform")
+
 def clean_price(text):
-    if not text:
-        return 0.0
-    cleaned = text.strip().replace(",", "").replace("$", "")
+    if not text or str(text).strip() == "":
+        raise ValueError("Price field is empty or missing")
+    cleaned = str(text).strip().replace(",", "").replace("$", "")
     return float(cleaned)
 
 def apply_discount(price, percent=DISCOUNT_PERCENT):
@@ -18,8 +21,19 @@ def transform_orders(rows, discount_percent=DISCOUNT_PERCENT):
         if oid not in orders:
             orders[oid] = Order(oid, row["customer"])
         
-        cleaned_price = clean_price(row["item_price"])
-        orders[oid].add_item(row["item_name"], cleaned_price)
+        item_name = row["item_name"]
+        price_raw = row["item_price"]
+        cleaned_price = None
+        
+        try:
+            cleaned_price = clean_price(price_raw)
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Skipping item '{item_name}' in order {oid} due to bad price '{price_raw}': {e}")
+        finally:
+            pass
+        
+        if cleaned_price is not None:
+            orders[oid].add_item(item_name, cleaned_price)
     
     transformed_data = []
     for oid, order in orders.items():
@@ -31,4 +45,5 @@ def transform_orders(rows, discount_percent=DISCOUNT_PERCENT):
             "total": final_total
         })
         
+    logger.info(f"Successfully transformed {len(transformed_data)} orders.")
     return transformed_data
