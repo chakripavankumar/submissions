@@ -6,4 +6,3 @@ class Order:
 
     def add_item(self, name, price):
         self.items.append((name, price))
-        

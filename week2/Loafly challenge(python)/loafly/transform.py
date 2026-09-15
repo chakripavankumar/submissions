@@ -1,30 +1,25 @@
 from loafly.models import Order
+from loafly.config import DISCOUNT_PERCENT
 
 def clean_price(text):
-    if not text or text == "":
+    if not text:
         return 0.0
-    return float(str(text).strip().replace(",", ""))
+    cleaned = text.strip().replace(",", "").replace("$", "")
+    return float(cleaned)
 
-def apply_discount(price, percent):
+def apply_discount(price, percent=DISCOUNT_PERCENT):
     return price - price * percent / 100
 
-def transform_orders(rows, discount_percent):
+def transform_orders(rows, discount_percent=DISCOUNT_PERCENT):
     orders = {}
     
     for row in rows:
-        oid = row.get("order_id")
-        customer = row.get("customer")
-        item_name = row.get("item_name")
-        item_price_raw = row.get("item_price")
-        
-        if not oid or not item_price_raw:
-            continue 
-            
+        oid = row["order_id"]
         if oid not in orders:
-            orders[oid] = Order(oid, customer)
+            orders[oid] = Order(oid, row["customer"])
         
-        cleaned_price = clean_price(item_price_raw)
-        orders[oid].add_item(item_name, cleaned_price)
+        cleaned_price = clean_price(row["item_price"])
+        orders[oid].add_item(row["item_name"], cleaned_price)
     
     transformed_data = []
     for oid, order in orders.items():

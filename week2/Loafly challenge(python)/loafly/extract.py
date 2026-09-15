@@ -1,12 +1,10 @@
 import csv
+from loafly.config import FILE_PATH
 
-def extract_orders(file_path):
+def extract_orders(file_path=FILE_PATH):
     rows = []
     with open(file_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            # Clean spaces from dictionary keys and values
-            cleaned_row = {k.strip(): v.strip() for k, v in row.items() if k and v}
-            rows.append(cleaned_row)
+            rows.append(row)
     return rows
-
