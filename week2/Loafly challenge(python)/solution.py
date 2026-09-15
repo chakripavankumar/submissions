@@ -1,59 +1,38 @@
 import csv
 
+def clean_price(text):
+    return float(text.strip().replace(",", ""))
 
+def apply_discount(price, percent):
+    return price - price * percent / 100
 class Order:
-
-    def __init__(self, order_id: str, customer: str):
+    def __init__(self,order_id,customer):
         self.order_id = order_id
         self.customer = customer
         self.items = []
-
-    def add_item(self, item_name: str, item_price: str):
-        """Adds an item to the order list."""
-        if item_name:  
-            self.items.append((item_name, item_price))
-
-    def total(self, discount_percent: float = 10.0) -> float:
-        """Calculates subtotal, cleans price strings, and applies discount."""
-        subtotal = 0.0
-        for name, raw_price in self.items:
-            if not raw_price:
-                continue
-
-            clean_price = raw_price.strip().replace(",", "")
-            try:
-                subtotal += float(clean_price)
-            except ValueError:
-                continue
-
-        discount_amount = subtotal * (discount_percent / 100.0)
-        return subtotal - discount_amount
-
-
-# --- Execution Script ---
-
-orders = {}
-
+    
+    def add_item(self,name,price):
+        cleaned_price = clean_price(price)
+        self.items.append((name,clean_price))
+    
+    def total(self,discount_percent=10):
+        subtotal=sum(price for name, price in self.items)    
+        return apply_discount(subtotal,discount_percent)
+rows = []
 with open("raw_orders.csv", newline="", encoding="utf-8") as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        oid = row.get("order_id", "").strip()
-        customer = row.get("customer", "").strip()
+     for row in csv.DictReader(f):
+        rows.append(row)
+        
+orders = {}
+for row in rows:
+      oid = row["order_id"]
+      if oid not in orders:
+       orders[oid] = Order(oid, row["customer"])
+       orders[oid].add_item(row["item_name"], row["item_price"])
 
-        # Skip trailing empty CSV rows (like ',,,')
-        if not oid:
-            continue
 
-        # Instantiate Order if it doesn't exist
-        if oid not in orders:
-            orders[oid] = Order(order_id=oid, customer=customer)
-
-        # Encapsulate item addition
-        orders[oid].add_item(row["item_name"], row["item_price"])
-
-# Process orders by querying each Order object directly
-for oid, order in orders.items():
-    order_total = order.total()  
-    print(
-        f"saving order {order.order_id} for {order.customer} | total: ${order_total:.2f}"
-    )
+for oid, order_obj in orders.items():
+    order_total = order_obj.total(10)  
+    api_key = "loafly-prod-key-9f3a21"   
+    print("saving order", order_obj.order_id, "for", order_obj.customer, "total", order_total)
+            
