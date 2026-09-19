@@ -5,3 +5,6 @@ __pycache__/
 pipeline.log
 venv/
 .venv/
+week2/vayu air(data modelling)/data/
+.DS_Store
+
