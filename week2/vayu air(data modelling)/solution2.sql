@@ -5,7 +5,7 @@
 -- surrogate-key foreign keys; each dimension has a surrogate primary key and keeps its business key.
 CREATE SCHEMA dw;
 GO CREATE TABLE dw.DimDate (
-        date_key INT IDENTITY(1, 1) PRIMARY KEY,
+        date_key INT PRIMARY KEY,
         calendar_date DATE NOT NULL UNIQUE,
         year INT NOT NULL,
         month INT NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE dw.DimPassenger (
     passenger_id INT NOT NULL,
     passenger_name VARCHAR(200) NOT NULL,
     home_airport_code VARCHAR(3),
-    frequent_flyer_tier VARCHAR(3),
+    frequent_flyer_tier VARCHAR(40),
     signup_date DATE,
     CONSTRAINT UQ_DimPassenger_passenger_id UNIQUE(passenger_id)
 );
@@ -40,7 +40,7 @@ CREATE TABLE dw.DimAirport (
 );
 CREATE TABLE dw.DimAircraft (
     aircraft_key INT IDENTITY(1, 1) PRIMARY KEY,
-    aircraft_code INT NOT NULL,
+    aircraft_code VARCHAR(50) NOT NULL,
     model VARCHAR(100),
     manufacturer VARCHAR(100),
     seat_capacity INT,
@@ -67,6 +67,4 @@ CREATE TABLE dw.FactTicketSales (
     CONSTRAINT FK_FactTicketSales_OriginAirport FOREIGN KEY(origin_airport_key) REFERENCES dw.DimAirport(airport_key),
     CONSTRAINT FK_FactTicketSales_DestinationAirport FOREIGN KEY (destination_airport_key) REFERENCES dw.DimAirport(airport_key),
     CONSTRAINT FK_FactTicketSales_Aircraft FOREIGN KEY (aircraft_key) REFERENCES dw.DimAircraft(aircraft_key),
-
 );
-
