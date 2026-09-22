@@ -1,0 +1,4 @@
+-- Question:
+-- Finance wants the revenue trend with momentum. 
+-- Produce monthly completed revenue with a cumulative running total and the month-over-month %  change 
+-- Required output: order_month (YYYY-MM), monthly_revenue, running_total, mom_pct_change.
