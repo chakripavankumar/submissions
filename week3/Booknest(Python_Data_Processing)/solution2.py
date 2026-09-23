@@ -8,7 +8,6 @@ def full_load(subject, max_pages=5):
     while page <= max_pages:
         books = get_books(subject, page)
 
-        # Stop if the API returns an empty page
         if not books:
             break
 
@@ -48,7 +47,6 @@ if __name__ == "__main__":
 
     print(f"Watermark: {watermark}")
 
-    # Simulate the next run
     new_books = incremental_load(books, watermark)
 
     print(f"Incremental books: {len(new_books)}")
