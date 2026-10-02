@@ -1,0 +1,15 @@
+{
+	"name": "de2learnings",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "26a4bcd1-c500-4bbe-bf43-50baa028acaf",
+		"tenantId": "b569bc9c-a4c8-4b18-ac21-3f023fbd9f64"
+	}
+}
